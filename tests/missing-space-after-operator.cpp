@@ -114,11 +114,3 @@ class test_6
     int operator ()(int a);
     int operator [](size_t a);
 };
-
-
-
-
-
-
-
-

@@ -19,7 +19,7 @@ void test_1(void)
     c=1;
 
     // Binary arithmetic operators
-    
+
     c = (a+b);
     c = (a*b);
     c = (a-b);
@@ -82,7 +82,7 @@ void test_2_1(void)
     c =1;
 
     // Binary arithmetic operators
-    
+
     c = (a +b);
     c = (a *b);
     c = (a -b);
@@ -145,7 +145,7 @@ void test_2_2(void)
     c  =1;
 
     // Binary arithmetic operators
-    
+
     c = (a  +b);
     c = (a  *b);
     c = (a  -b);
@@ -208,7 +208,7 @@ void test_3_1(void)
     c= 1;
 
     // Binary arithmetic operators
-    
+
     c = (a+ b);
     c = (a* b);
     c = (a- b);
@@ -271,7 +271,7 @@ void test_3_2(void)
     c=  1;
 
     // Binary arithmetic operators
-    
+
     c = (a+  b);
     c = (a*  b);
     c = (a-  b);
@@ -334,7 +334,7 @@ void test_4_1(void)
     c	=1;
 
     // Binary arithmetic operators
-    
+
     c = (a	+b);
     c = (a	*b);
     c = (a	-b);
@@ -397,7 +397,7 @@ void test_4_2(void)
     c		=1;
 
     // Binary arithmetic operators
-    
+
     c = (a		+b);
     c = (a		*b);
     c = (a		-b);
@@ -460,7 +460,7 @@ void test_5_1(void)
     c=	1;
 
     // Binary arithmetic operators
-    
+
     c = (a+	b);
     c = (a*	b);
     c = (a-	b);
@@ -523,7 +523,7 @@ void test_5_2(void)
     c=		1;
 
     // Binary arithmetic operators
-    
+
     c = (a+		b);
     c = (a*		b);
     c = (a-		b);
@@ -586,7 +586,7 @@ void test_6(void)
     c=(1);
 
     // Binary arithmetic operators
-    
+
     c = ((a)+(b));
     c = ((a)*(b));
     c = ((a)-(b));
