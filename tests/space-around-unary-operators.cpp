@@ -279,4 +279,3 @@ bool test_6_2n(void)
 
     return !(b);
 }
-
