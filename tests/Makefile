@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2001-2016 Grant Erickson
+#    Copyright (c) 2001-2017 Grant Erickson
 #
 #    Description:
 #      Makefile for 'cstyle' coding style and conventions enforcement
@@ -8,19 +8,34 @@
 
 .SUFFIXES: .c .cpp .cmp .mm .stamp .test
 
-CC	 ?= gcc
-CXX	 ?= g++
-OBJC     ?= gcc
-OBJCXX   ?= g++
+CC	     ?= gcc
+CXX	     ?= g++
+OBJC         ?= gcc
+OBJCXX       ?= g++
 
 ifeq ($(DEBUG),1)
 COMPARE      ?= comm -3 --nocheck-order
 else
 COMPARE      ?= cmp -s
 endif
-PERL     ?= perl
-CSTYLE   ?= $(PWD)/../cstyle.pl
-CSTYLE_V := $(CSTYLE) -v
+
+#
+# Always enforce white space checks to ensure our internal unit test
+# files are clean and only contain the warnings of interest.
+#
+PERL         ?= perl
+CSTYLE       ?= $(PWD)/../cstyle.pl
+CSTYLE_FLAGS ?= -Wblank-trailing-space -Wtrailing-line -Wtrailing-space
+CSTYLE_V     := $(CSTYLE) -v $(CSTYLE_FLAGS)
+
+#
+# cstyle-target <option(s)> <input file(s)> <output file>
+#
+define cstyle-target
+@$(PERL) $(CSTYLE_V) $(1) $(2) 2> $(3)
+endef
+
+COPYRIGHT_REGEXP := '^( \*|\/\*|\/\/)    Copyright (\(c\) )*\d{4,}(-\d{4,})* Nest Labs, Inc\.'
 
 %.stamp: %.c
 	@echo "  CC      $<"
@@ -136,14 +151,14 @@ endef
 
 blank-trailing-space.test: blank-trailing-space.cpp blank-trailing-space.cmp blank-trailing-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wblank-trailing-space..."
-	@$(PERL) $(CSTYLE_V) -Wblank-trailing-space blank-trailing-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wblank-trailing-space,blank-trailing-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-blank-trailing-space: blank-trailing-space.test
 
 no-blank-trailing-space.test: blank-trailing-space.cpp no-blank-trailing-space.cmp blank-trailing-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-blank-trailing-space..."
-	@$(PERL) $(CSTYLE_V) -Wno-blank-trailing-space blank-trailing-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-blank-trailing-space,blank-trailing-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-blank-trailing-space: no-blank-trailing-space.test
@@ -152,14 +167,14 @@ check-no-blank-trailing-space: no-blank-trailing-space.test
 
 missing-cpp-conditional-labels.test: missing-cpp-conditional-labels.cpp missing-cpp-conditional-labels.cmp missing-cpp-conditional-labels.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-cpp-conditional-labels..."
-	@$(PERL) $(CSTYLE_V) --cpp-lines-between-conditionals=1 -Wmissing-cpp-conditional-labels missing-cpp-conditional-labels.cpp 2> $(@)
+	@$(call cstyle-target,--cpp-lines-between-conditionals=1 -Wmissing-cpp-conditional-labels,missing-cpp-conditional-labels.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-cpp-conditional-labels: missing-cpp-conditional-labels.test
 
 no-missing-cpp-conditional-labels.test: missing-cpp-conditional-labels.cpp no-missing-cpp-conditional-labels.cmp missing-cpp-conditional-labels.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-cpp-conditional-labels..."
-	@$(PERL) $(CSTYLE_V) --cpp-lines-between-conditionals=1 -Wno-missing-cpp-conditional-labels missing-cpp-conditional-labels.cpp 2> $(@)
+	@$(call cstyle-target,--cpp-lines-between-conditionals=1 -Wno-missing-cpp-conditional-labels,missing-cpp-conditional-labels.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-cpp-conditional-labels: no-missing-cpp-conditional-labels.test
@@ -168,14 +183,14 @@ check-no-missing-cpp-conditional-labels: no-missing-cpp-conditional-labels.test
 
 cpp-constant-conditionals.test: cpp-constant-conditionals.cpp cpp-constant-conditionals.cmp cpp-constant-conditionals.stamp $(CSTYLE)
 	@echo "  CHECK   -Wcpp-constant-conditionals..."
-	@$(PERL) $(CSTYLE_V) -Wcpp-constant-conditionals cpp-constant-conditionals.cpp 2> $(@)
+	@$(call cstyle-target,-Wcpp-constant-conditionals,cpp-constant-conditionals.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-cpp-constant-conditionals: cpp-constant-conditionals.test
 
 no-cpp-constant-conditionals.test: cpp-constant-conditionals.cpp no-cpp-constant-conditionals.cmp cpp-constant-conditionals.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-cpp-constant-conditionals..."
-	@$(PERL) $(CSTYLE_V) -Wno-cpp-constant-conditionals cpp-constant-conditionals.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-cpp-constant-conditionals,cpp-constant-conditionals.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-cpp-constant-conditionals: no-cpp-constant-conditionals.test
@@ -184,14 +199,14 @@ check-no-cpp-constant-conditionals: no-cpp-constant-conditionals.test
 
 cpp-directive-leading-space.test: cpp-directive-leading-space.cpp cpp-directive-leading-space.cmp cpp-directive-leading-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wcpp-directive-leading-space..."
-	@$(PERL) $(CSTYLE_V) -Wcpp-directive-leading-space cpp-directive-leading-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wcpp-directive-leading-space,cpp-directive-leading-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-cpp-directive-leading-space: cpp-directive-leading-space.test
 
 no-cpp-directive-leading-space.test: cpp-directive-leading-space.cpp no-cpp-directive-leading-space.cmp cpp-directive-leading-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-cpp-directive-leading-space..."
-	@$(PERL) $(CSTYLE_V) -Wno-cpp-directive-leading-space cpp-directive-leading-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-cpp-directive-leading-space,cpp-directive-leading-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-cpp-directive-leading-space: no-cpp-directive-leading-space.test
@@ -200,14 +215,14 @@ check-no-cpp-directive-leading-space: no-cpp-directive-leading-space.test
 
 file-length.test: file-length.cpp file-length.cmp file-length.stamp $(CSTYLE)
 	@echo "  CHECK   -Wfile-length..."
-	@$(PERL) $(CSTYLE_V) --file-length=5 -Wfile-length file-length.cpp 2> $(@)
+	@$(call cstyle-target,--file-length=5 -Wfile-length,file-length.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-file-length: file-length.test
 
 no-file-length.test: file-length.cpp no-file-length.cmp file-length.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-file-length..."
-	@$(PERL) $(CSTYLE_V) --file-length=5 -Wno-file-length file-length.cpp 2> $(@)
+	@$(call cstyle-target,--file-length=5 -Wno-file-length,file-length.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-file-length: no-file-length.test
@@ -216,14 +231,14 @@ check-no-file-length: no-file-length.test
 
 implicit-void-declaration.test: implicit-void-declaration.cpp implicit-void-declaration.cmp implicit-void-declaration.stamp $(CSTYLE)
 	@echo "  CHECK   -Wimplicit-void-declaration..."
-	@$(PERL) $(CSTYLE_V) -Wimplicit-void-declaration implicit-void-declaration.cpp 2> $(@)
+	@$(call cstyle-target,-Wimplicit-void-declaration,implicit-void-declaration.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-implicit-void-declaration: implicit-void-declaration.test
 
 no-implicit-void-declaration.test: implicit-void-declaration.cpp no-implicit-void-declaration.cmp implicit-void-declaration.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-implicit-void-declaration..."
-	@$(PERL) $(CSTYLE_V) -Wno-implicit-void-declaration implicit-void-declaration.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-implicit-void-declaration,implicit-void-declaration.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-implicit-void-declaration: no-implicit-void-declaration.test
@@ -232,14 +247,14 @@ check-no-implicit-void-declaration: no-implicit-void-declaration.test
 
 interpolated-space.test: interpolated-space.cpp interpolated-space.cmp interpolated-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Winterpolated-space..."
-	@$(PERL) $(CSTYLE_V) -Winterpolated-space interpolated-space.cpp 2> $(@)
+	@$(call cstyle-target,-Winterpolated-space,interpolated-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-interpolated-space: interpolated-space.test
 
 no-interpolated-space.test: interpolated-space.cpp no-interpolated-space.cmp interpolated-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-interpolated-space..."
-	@$(PERL) $(CSTYLE_V) -Wno-interpolated-space interpolated-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-interpolated-space,interpolated-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-interpolated-space: no-interpolated-space.test
@@ -248,14 +263,14 @@ check-no-interpolated-space: no-interpolated-space.test
 
 line-length.test: line-length.cpp line-length.cmp line-length.stamp $(CSTYLE)
 	@echo "  CHECK   -Wline-length..."
-	@$(PERL) $(CSTYLE_V) --line-length=80 --tab-size=4 -Wline-length line-length.cpp 2> $(@)
+	@$(call cstyle-target,--line-length=80 --tab-size=4 -Wline-length,line-length.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-line-length: line-length.test
 
 no-line-length.test: line-length.cpp no-line-length.cmp line-length.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-line-length..."
-	@$(PERL) $(CSTYLE_V) --line-length=80 --tab-size=4 -Wno-line-length line-length.cpp 2> $(@)
+	@$(call cstyle-target,--line-length=80 --tab-size=4 -Wno-line-length,line-length.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-line-length: no-line-length.test
@@ -264,14 +279,14 @@ check-no-line-length: no-line-length.test
 
 missing-copyright.test: missing-copyright.cpp missing-copyright.cmp missing-copyright.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-copyright..."
-	@$(PERL) $(CSTYLE_V) --copyright='^( \*|\/\*|\/\/)    Copyright (\(c\) )*\d{4,}(-\d{4,})* Nest Labs, Inc\.' -Wmissing-copyright missing-copyright.cpp 2> $(@)
+	@$(call cstyle-target,--copyright=$(COPYRIGHT_REGEXP) -Wmissing-copyright,missing-copyright.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-copyright: missing-copyright.test
 
 no-missing-copyright.test: no-missing-copyright.cpp no-missing-copyright.cmp no-missing-copyright.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-copyright..."
-	@$(PERL) $(CSTYLE_V) --copyright='^( \*|\/\*|\/\/)    Copyright (\(c\) )*\d{4,}(-\d{4,})* Nest Labs, Inc\.' -Wno-missing-copyright no-missing-copyright.cpp 2> $(@)
+	@$(call cstyle-target,--copyright=--copyright=$(COPYRIGHT_REGEXP) -Wno-missing-copyright,no-missing-copyright.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-copyright: no-missing-copyright.test
@@ -280,14 +295,14 @@ check-no-missing-copyright: no-missing-copyright.test
 
 missing-newline-at-eof.test: missing-newline-at-eof.cpp missing-newline-at-eof.cmp missing-newline-at-eof.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-newline-at-eof..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-newline-at-eof missing-newline-at-eof.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-newline-at-eof,missing-newline-at-eof.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-newline-at-eof: missing-newline-at-eof.test
 
 no-missing-newline-at-eof.test: missing-newline-at-eof.cpp no-missing-newline-at-eof.cmp missing-newline-at-eof.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-newline-at-eof..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-newline-at-eof missing-newline-at-eof.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-newline-at-eof,missing-newline-at-eof.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-newline-at-eof: no-missing-newline-at-eof.test
@@ -296,14 +311,14 @@ check-no-missing-newline-at-eof: no-missing-newline-at-eof.test
 
 missing-space-after-comma.test: missing-space-after-comma.cpp missing-space-after-comma.cmp missing-space-after-comma.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-comma..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-comma missing-space-after-comma.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-comma,missing-space-after-comma.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-comma: missing-space-after-comma.test
 
 no-missing-space-after-comma.test: missing-space-after-comma.cpp no-missing-space-after-comma.cmp missing-space-after-comma.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-comma..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-comma missing-space-after-comma.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-comma,missing-space-after-comma.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-comma: no-missing-space-after-comma.test
@@ -312,14 +327,14 @@ check-no-missing-space-after-comma: no-missing-space-after-comma.test
 
 missing-space-after-else-if.test: missing-space-after-else-if.cpp missing-space-after-else-if.cmp missing-space-after-else-if.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-else-if..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-else-if missing-space-after-else-if.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-else-if,missing-space-after-else-if.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-else-if: missing-space-after-else-if.test
 
 no-missing-space-after-else-if.test: missing-space-after-else-if.cpp no-missing-space-after-else-if.cmp missing-space-after-else-if.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-else-if..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-else-if missing-space-after-else-if.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-else-if,missing-space-after-else-if.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-else-if: no-missing-space-after-else-if.test
@@ -328,14 +343,14 @@ check-no-missing-space-after-else-if: no-missing-space-after-else-if.test
 
 missing-space-after-for.test: missing-space-after-for.cpp missing-space-after-for.cmp missing-space-after-for.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-for..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-for missing-space-after-for.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-for,missing-space-after-for.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-for: missing-space-after-for.test
 
 no-missing-space-after-for.test: missing-space-after-for.cpp no-missing-space-after-for.cmp missing-space-after-for.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-for..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-for missing-space-after-for.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-for,missing-space-after-for.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-for: no-missing-space-after-for.test
@@ -344,14 +359,14 @@ check-no-missing-space-after-for: no-missing-space-after-for.test
 
 missing-space-after-if.test: missing-space-after-if.cpp missing-space-after-if.cmp missing-space-after-if.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-if..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-if missing-space-after-if.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-if,missing-space-after-if.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-if: missing-space-after-if.test
 
 no-missing-space-after-if.test: missing-space-after-if.cpp no-missing-space-after-if.cmp missing-space-after-if.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-if..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-if missing-space-after-if.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-if,missing-space-after-if.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-if: no-missing-space-after-if.test
@@ -360,14 +375,14 @@ check-no-missing-space-after-if: no-missing-space-after-if.test
 
 missing-space-after-operator.test: missing-space-after-operator.cpp missing-space-after-operator.cmp missing-space-after-operator.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-operator..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-operator missing-space-after-operator.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-operator,missing-space-after-operator.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-operator: missing-space-after-operator.test
 
 no-missing-space-after-operator.test: missing-space-after-operator.cpp no-missing-space-after-operator.cmp missing-space-after-operator.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-operator..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-operator missing-space-after-operator.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-operator,missing-space-after-operator.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-operator: no-missing-space-after-operator.test
@@ -376,14 +391,14 @@ check-no-missing-space-after-operator: no-missing-space-after-operator.test
 
 missing-space-after-semicolon.test: missing-space-after-semicolon.cpp missing-space-after-semicolon.cmp missing-space-after-semicolon.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-semicolon..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-semicolon missing-space-after-semicolon.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-semicolon,missing-space-after-semicolon.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-semicolon: missing-space-after-semicolon.test
 
 no-missing-space-after-semicolon.test: missing-space-after-semicolon.cpp no-missing-space-after-semicolon.cmp missing-space-after-semicolon.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-semicolon..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-semicolon missing-space-after-semicolon.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-semicolon,missing-space-after-semicolon.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-semicolon: no-missing-space-after-semicolon.test
@@ -392,14 +407,14 @@ check-no-missing-space-after-semicolon: no-missing-space-after-semicolon.test
 
 missing-space-after-switch.test: missing-space-after-switch.cpp missing-space-after-switch.cmp missing-space-after-switch.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-switch..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-switch missing-space-after-switch.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-switch,missing-space-after-switch.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-switch: missing-space-after-switch.test
 
 no-missing-space-after-switch.test: missing-space-after-switch.cpp no-missing-space-after-switch.cmp missing-space-after-switch.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-switch..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-switch missing-space-after-switch.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-switch,missing-space-after-switch.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-switch: no-missing-space-after-switch.test
@@ -408,14 +423,14 @@ check-no-missing-space-after-switch: no-missing-space-after-switch.test
 
 missing-space-after-while.test: missing-space-after-while.cpp missing-space-after-while.cmp missing-space-after-while.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-after-while..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-after-while missing-space-after-while.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-after-while,missing-space-after-while.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-after-while: missing-space-after-while.test
 
 no-missing-space-after-while.test: missing-space-after-while.cpp no-missing-space-after-while.cmp missing-space-after-while.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-after-while..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-after-while missing-space-after-while.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-after-while,missing-space-after-while.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-after-while: no-missing-space-after-while.test
@@ -424,14 +439,14 @@ check-no-missing-space-after-while: no-missing-space-after-while.test
 
 missing-space-around-binary-operators.test: missing-space-around-binary-operators.cpp missing-space-around-binary-operators.cmp missing-space-around-binary-operators.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-around-binary-operators..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-around-binary-operators missing-space-around-binary-operators.cpp 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-around-binary-operators,missing-space-around-binary-operators.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-around-binary-operators: missing-space-around-binary-operators.test
 
 no-missing-space-around-binary-operators.test: missing-space-around-binary-operators.cpp no-missing-space-around-binary-operators.cmp missing-space-around-binary-operators.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-around-binary-operators..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-around-binary-operators missing-space-around-binary-operators.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-around-binary-operators,missing-space-around-binary-operators.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-around-binary-operators: no-missing-space-around-binary-operators.test
@@ -440,14 +455,14 @@ check-no-missing-space-around-binary-operators: no-missing-space-around-binary-o
 
 missing-space-around-braces.test: missing-space-around-braces.mm missing-space-around-braces.cmp missing-space-around-braces.stamp $(CSTYLE)
 	@echo "  CHECK   -Wmissing-space-around-braces..."
-	@$(PERL) $(CSTYLE_V) -Wmissing-space-around-braces missing-space-around-braces.mm 2> $(@)
+	@$(call cstyle-target,-Wmissing-space-around-braces,missing-space-around-braces.mm,$(@))
 	@$(call compare-target,$(@))
 
 check-missing-space-around-braces: missing-space-around-braces.test
 
 no-missing-space-around-braces.test: missing-space-around-braces.mm no-missing-space-around-braces.cmp missing-space-around-braces.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-missing-space-around-braces..."
-	@$(PERL) $(CSTYLE_V) -Wno-missing-space-around-braces missing-space-around-braces.mm 2> $(@)
+	@$(call cstyle-target,-Wno-missing-space-around-braces,missing-space-around-braces.mm,$(@))
 	@$(call compare-target,$(@))
 
 check-no-missing-space-around-braces: no-missing-space-around-braces.test
@@ -456,14 +471,14 @@ check-no-missing-space-around-braces: no-missing-space-around-braces.test
 
 space-around-unary-operators.test: space-around-unary-operators.cpp space-around-unary-operators.cmp space-around-unary-operators.stamp $(CSTYLE)
 	@echo "  CHECK   -Wspace-around-unary-operators..."
-	@$(PERL) $(CSTYLE_V) -Wspace-around-unary-operators space-around-unary-operators.cpp 2> $(@)
+	@$(call cstyle-target,-Wspace-around-unary-operators,space-around-unary-operators.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-space-around-unary-operators: space-around-unary-operators.test
 
 no-space-around-unary-operators.test: space-around-unary-operators.cpp no-space-around-unary-operators.cmp space-around-unary-operators.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-space-around-unary-operators..."
-	@$(PERL) $(CSTYLE_V) -Wno-space-around-unary-operators space-around-unary-operators.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-space-around-unary-operators,space-around-unary-operators.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-space-around-unary-operators: no-space-around-unary-operators.test
@@ -472,14 +487,14 @@ check-no-space-around-unary-operators: no-space-around-unary-operators.test
 
 trailing-line.test: trailing-line.cpp trailing-line.cmp trailing-line.stamp $(CSTYLE)
 	@echo "  CHECK   -Wtrailing-line..."
-	@$(PERL) $(CSTYLE_V) -Wtrailing-line trailing-line.cpp 2> $(@)
+	@$(call cstyle-target,-Wtrailing-line,trailing-line.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-trailing-line: trailing-line.test
 
 no-trailing-line.test: trailing-line.cpp no-trailing-line.cmp trailing-line.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-trailing-line..."
-	@$(PERL) $(CSTYLE_V) -Wno-trailing-line trailing-line.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-trailing-line,trailing-line.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-trailing-line: no-trailing-line.test
@@ -488,14 +503,14 @@ check-no-trailing-line: no-trailing-line.test
 
 trailing-space.test: trailing-space.cpp trailing-space.cmp trailing-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wtrailing-space..."
-	@$(PERL) $(CSTYLE_V) -Wtrailing-space trailing-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wtrailing-space,trailing-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-trailing-space: trailing-space.test
 
 no-trailing-space.test: trailing-space.cpp no-trailing-space.cmp trailing-space.stamp $(CSTYLE)
 	@echo "  CHECK   -Wno-trailing-space..."
-	@$(PERL) $(CSTYLE_V) -Wno-trailing-space trailing-space.cpp 2> $(@)
+	@$(call cstyle-target,-Wno-trailing-space,trailing-space.cpp,$(@))
 	@$(call compare-target,$(@))
 
 check-no-trailing-space: no-trailing-space.test
