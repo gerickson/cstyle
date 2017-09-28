@@ -11,7 +11,7 @@ void test_1(int aArgument)
     case 1:
         describe("The value is odd");
         break;
-        
+
     case 2:
         describe("The value is even");
         break;
@@ -31,7 +31,7 @@ void test_2(int aArgument)
     case 1:
         describe("The value is odd");
         break;
-        
+
     case 2:
         describe("The value is even");
         break;
