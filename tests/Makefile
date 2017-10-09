@@ -8,8 +8,8 @@
 
 .SUFFIXES: .c .cpp .cmp .mm .stamp .test
 
-CC	     ?= gcc
-CXX	     ?= g++
+CC           ?= gcc
+CXX          ?= g++
 OBJC         ?= gcc
 OBJCXX       ?= g++
 
