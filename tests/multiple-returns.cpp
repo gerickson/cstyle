@@ -9,16 +9,16 @@ class _Test1
 {
 public:
     _Test1(void) { return; }
-    ~Test1(void) { return; }
+    ~_Test1(void) { return; }
 
-    int Mul(int bar) { return (bar * 3); }
+    static int Mul(int bar) { return (bar * 3); }
 
     static void Baz(int bar)
     {
         if (bar)
             sMoof += bar;
         else
-            sMoof += mul(bar);
+            sMoof += Mul(bar);
 
         return;
     }
