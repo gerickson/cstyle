@@ -32,7 +32,7 @@ static wchar_t charsets[] =
  */
 
 static int array_1[] = {0,1,2,3,4,5};	// These should generate a violation
-static int array_2[] = {0,		// End of line, these should not 
+static int array_2[] = {0,		// End of line, these should not
                         1,		// generate a violation.
                         2,
                         3,

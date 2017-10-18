@@ -137,4 +137,3 @@ int FunctionToExclude_10(void)
     return 0;
 }
 #endif
-
