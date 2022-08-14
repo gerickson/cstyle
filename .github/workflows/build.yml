@@ -55,6 +55,8 @@ jobs:
     runs-on: macos-latest
     name: "macOS"
 
+    steps:
+
     - name: Checkout
       uses: actions/checkout@v2
 
