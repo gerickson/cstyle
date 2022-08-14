@@ -38,7 +38,7 @@ jobs:
     - name: Install Common Host Package Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get -y gobjc++
+        sudo apt-get -y install gobjc++
 
     - name: Checkout
       uses: actions/checkout@v2
