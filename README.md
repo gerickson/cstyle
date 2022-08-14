@@ -1,4 +1,8 @@
-[![Build Status][cstyle-travis-svg]][cstyle-travis]
+[![Build Status][cstyle-github-action-svg]][cstyle-github-action]
+
+[cstyle-github]: https://github.com/gerickson/cstyle
+[cstyle-github-action]: https://github.com/gerickson/cstyle/actions?query=workflow%3Abuild+branch%3Amaster+event%3Apush
+[cstyle-github-action-svg]: https://github.com/gerickson/cstyle/actions/workflows/build.yml/badge.svg?branch=master&event=push
 
 cstyle
 ======
@@ -16,9 +20,6 @@ Where possible, effort is expended to make the syntax, option
 invocation, and output familiar to users of compilers and other
 linting and formatting tools for ease of use and efficient
 system integration.
-
-[cstyle-travis]: https://travis-ci.org/gerickson/cstyle
-[cstyle-travis-svg]: https://travis-ci.org/gerickson/cstyle.svg?branch=master
 
 # Versioning
 
